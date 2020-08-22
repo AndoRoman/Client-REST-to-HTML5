@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Client - REST</title>
+    <link rel="icon" href="static/Logo_PUCMM.png" type="image/png">
+    <link href="static/styles.css" rel="stylesheet"/>
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
+</head>
+<body>
+<main>
+    <div class="container-fluid">
+        <h1 class="mt-4 text-center">Mis Formularios</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item active"><a href="/loginOUT">Cerrar Sesion</a></li>
+        </ol>
+        <div class="card mb-4">
+            <div class="card-body">
+                <a href="/crear" class="btn btn-warning btn-lg">Crear Nuevo Formulario</a>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header" th:text="${user}">
+
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table cellspacing="0" class="table table-bordered" id="dataTable" width="100%">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Sector</th>
+                            <th>Nivel Escolar</th>
+                            <th>Latitud</th>
+                            <th>Longitud</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Sector</th>
+                            <th>Nivel Escolar</th>
+                            <th>Latitud</th>
+                            <th>Longitud</th>
+                        </tr>
+                        </tfoot>
+                        <tbody>
+                        <tr th:each="Formulario : ${Formularios}">
+                            <td class="align-middle" th:text="${Formulario.id}"></td>
+                            <td class="align-middle" th:text="${Formulario.nombre}"></td>
+                            <td class="align-middle" th:text="${Formulario.sector}"></td>
+                            <td class="align-middle" th:text="${Formulario.NivelEscolar}"></td>
+                            <td class="align-middle" th:text="${Formulario.ubicacion.longitud}"></td>
+                            <td class="align-middle" th:text="${Formulario.ubicacion.latitud}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
