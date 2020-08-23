@@ -55,8 +55,6 @@ public class ControladorPlantilla {
 
                 String usuario = ctx.sessionAttribute("usuario");
 
-;
-
                 ctx.uploadedFiles("thefiles").forEach(uploadedFile -> {
                     System.out.println("\n CARGANDO IMAGEN!! \n");
                     try {
@@ -74,8 +72,7 @@ public class ControladorPlantilla {
                 });
 
 
-
-
+                ctx.redirect("/dashboard");
 
             });
 
@@ -88,10 +85,10 @@ public class ControladorPlantilla {
 
                     Map<String, Object> modelo = new HashMap<>();
                     modelo.put("user", "Formularios creados por " + ctx.sessionAttribute("usuario"));
-                    modelo.put("formularios", ClientREST.listaFormulario()); //<-- ENVIAR forms de USUARIO CORRESPONDIENTE
+                    modelo.put("formularios", ClientREST.listaFormulario(ctx.sessionAttribute("usuario"))); //<-- ENVIAR forms de USUARIO CORRESPONDIENTE
                     ctx.render("/index.html", modelo);
                 } else {
-                    ctx.redirect("/login");
+                    ctx.redirect("/");
                 }
             });
 
