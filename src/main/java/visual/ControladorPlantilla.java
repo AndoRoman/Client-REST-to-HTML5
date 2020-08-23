@@ -82,10 +82,11 @@ public class ControladorPlantilla {
                 //VERIFICAR SI EXISTE COOKIE PARA ENTRAR A LA PAGINA PRINCIPAL O LLEVAR AL LOGIN
                 if (ctx.sessionAttribute("usuario") != null) {
 
+                    System.out.println("formularios: " + ClientREST.listaFormulario(ctx.sessionAttribute("usuario")));
 
                     Map<String, Object> modelo = new HashMap<>();
                     modelo.put("user", "Formularios creados por " + ctx.sessionAttribute("usuario"));
-                    modelo.put("formularios", ClientREST.listaFormulario(ctx.sessionAttribute("usuario"))); //<-- ENVIAR forms de USUARIO CORRESPONDIENTE
+                    modelo.put("Formularios", ClientREST.listaFormulario(ctx.sessionAttribute("usuario"))); //<-- ENVIAR forms de USUARIO CORRESPONDIENTE
                     ctx.render("/index.html", modelo);
                 } else {
                     ctx.redirect("/");
@@ -107,7 +108,7 @@ public class ControladorPlantilla {
                 String user = ctx.formParam("user");
                 String pass = ctx.formParam("pass");
 
-                if (user.matches("admin") && pass.matches("admin")) {
+                if (ClientREST.consultarUsuario(user)) {
                     //creando un atributo de sesion
                     ctx.sessionAttribute("usuario", user);
                     //PAGINA PRINCIPAL

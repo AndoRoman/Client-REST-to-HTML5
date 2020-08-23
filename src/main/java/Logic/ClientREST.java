@@ -1,10 +1,13 @@
 package Logic;
 
 import com.google.gson.JsonObject;
+import kong.unirest.GenericType;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 
 import kong.unirest.HttpResponse;
+
+import java.util.List;
 
 public class ClientREST {
 
@@ -12,35 +15,38 @@ public class ClientREST {
 
     private static String URLApi = "http://localhost:8043/api-Reset/formulario";
 
-    public static void consultarEstudiante(String matricula){
-        System.out.println("Consultado Estudiante con la matricula: " + matricula + "\n");
+    public static boolean consultarUsuario(String usuario){
 
-        HttpResponse<JsonNode> repuestaServidor = Unirest.get(URLApi+"{matricula}")
-                .routeParam("matricula", matricula)
-                .asJson();
+        String repuesta = Unirest.get("http://localhost:8043/api-Reset/formulario/" + "{autenticar}")
+                .routeParam("autenticar", usuario)
+                .asObject(String.class).getBody();
+        System.out.println( "autenticar: " + repuesta);
+        if (repuesta.matches("true")){
+            return true;
+        }
+        else {
+            return false;
+        }
 
-        System.out.println("Repuesta del Servidor: \n"+repuestaServidor.getBody()+"\n");
     }
 
-    public static kong.unirest.json.JSONObject listaFormulario(String usuario){
+    public static List<Formulario> listaFormulario(String usuario){
 
 
         HttpResponse<JsonNode> Listafull = Unirest.get("http://localhost:8043/api-Reset/formulario/listar").asJson();
         idGlobal = Listafull.getBody().getArray().length();
         try {
-            HttpResponse<JsonNode> repuestaServidor = Unirest.get("http://localhost:8043/api-Reset/formulario/listar-por-usuario" + "{usuario}")
+            List<Formulario> nuevosForms = Unirest.get("http://localhost:8043/api-Reset/formulario/listar-por-nombre/" + "{usuario}")
                     .routeParam("usuario", usuario)
-                    .asJson();
+                    .asObject(new GenericType<List<Formulario>>() {}).getBody();
 
-            System.out.print("los forms:  " + repuestaServidor.getBody());
-
-            return repuestaServidor.getBody().getObject();
+            return nuevosForms;
 
         }catch (Exception e){
-            System.out.println("Mostrando todos los formularios");
-            return Listafull.getBody().getObject();
+            System.out.println("Not Working List Forms");
         }
 
+        return null;
     }
 
     public static void crearFormulario(String nombre, String sector, String nivelEscolar, String usuario,
