@@ -1,6 +1,8 @@
 package Logic;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import kong.unirest.GenericType;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -10,36 +12,35 @@ import kong.unirest.HttpResponse;
 import java.util.List;
 
 public class ClientREST {
+    /**
+     * Referencia: https://www.adictosaltrabajo.com/2012/09/17/gson-java-json/
+     */
 
     private static int idGlobal;
-
-    private static String URLApi = "http://localhost:8043/api-Reset/formulario";
+    private  static String token;
+    private static String URLApi = "http://localhost:8043/api-Rest/formulario";
+    private static RepuestaLogin repuestaLogin=null;
 
     public static boolean consultarUsuario(String usuario){
-
-        String repuesta = Unirest.get("http://localhost:8043/api-Reset/formulario/" + "{autenticar}")
+        HttpResponse<String> repuestaServidor = Unirest.get("http://localhost:8043/api-Rest/" + "{autenticar}")
                 .routeParam("autenticar", usuario)
-                .asObject(String.class).getBody();
-        System.out.println( "autenticar: " + repuesta);
-        if (repuesta.matches("true")){
+                .asString();
+        Gson gson = new Gson();
+        repuestaLogin = gson.fromJson(repuestaServidor.getBody(), RepuestaLogin.class);
+        System.out.println("Token recibido... "+repuestaLogin.getToken());
+        if (repuestaLogin.getToken()!=null){
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
 
     }
-
     public static List<Formulario> listaFormulario(String usuario){
-
-
-        HttpResponse<JsonNode> Listafull = Unirest.get("http://localhost:8043/api-Reset/formulario/listar").asJson();
-        idGlobal = Listafull.getBody().getArray().length();
         try {
-            List<Formulario> nuevosForms = Unirest.get("http://localhost:8043/api-Reset/formulario/listar-por-nombre/" + "{usuario}")
+            List<Formulario> nuevosForms = Unirest.get("http://localhost:8043/api-Rest/formulario/listar-por-nombre/" + "{usuario}")
                     .routeParam("usuario", usuario)
+                    .header("Authorization",repuestaLogin.getToken())
                     .asObject(new GenericType<List<Formulario>>() {}).getBody();
-
+            idGlobal = nuevosForms.size();
             return nuevosForms;
 
         }catch (Exception e){
@@ -67,17 +68,15 @@ public class ClientREST {
         nuevoForm.addProperty("nivelEscolar", nivelEscolar);
         nuevoForm.addProperty("latitud", lati);
         nuevoForm.addProperty("longitud", longi);
-        nuevoForm.addProperty("id", idGlobal + 1);
+        nuevoForm.addProperty("id", usuario+"-"+idGlobal + 1);
         nuevoForm.addProperty("usuario", usuario);
         nuevoForm.add("foto", imgJSON);
 
-
-        HttpResponse<JsonNode> repuestaServidor = Unirest.post("http://localhost:8043/api-Reset/formulario/agregar")
+        HttpResponse<JsonNode> repuestaServidor = Unirest.post("http://localhost:8043/api-Rest/formulario/agregar/")
                 .header("Content-Type", "application/json")
+                .header("Authorization",repuestaLogin.getToken())
                 .body(nuevoForm)
                 .asJson();
-
-        //aumentando idGlobal
         idGlobal++;
         System.out.println("Nuevo Formulario: "+ repuestaServidor.getBody());
     }
